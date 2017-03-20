@@ -17,9 +17,9 @@ class Help extends Component {
             <p>Данный прототип системы работает в режиме со статическими данными. Динамически загрузить данные на текущий момент нельзя.</p>
             <p>Ознакомиться с текущими данными можно по ссылкам:</p>
             <ol>
-              <li><a href="https://ru.wikipedia.org/wiki/WebSocket">GeoJSON узлов для карты</a></li>
-              <li><a href="https://ru.wikipedia.org/wiki/WebSocket">Данные об узлах</a></li>
-              <li><a href="https://ru.wikipedia.org/wiki/WebSocket">Показания датчиков узлов</a></li>
+              <li><a href="https://github.com/Dosant/Pipeline-control-system/blob/master/data/geo.pipe.json">GeoJSON узлов для карты</a></li>
+              <li><a href="https://github.com/Dosant/Pipeline-control-system/blob/master/data/elements.json">Данные об узлах</a></li>
+              <li><a href="https://raw.githubusercontent.com/Dosant/Pipeline-control-system/master/data/data.json">Показания датчиков узлов</a></li>
             </ol>
             <hr/>
             <h4>2. Работа с системой</h4>
@@ -34,7 +34,7 @@ class Help extends Component {
             <hr/>
             <h4>3. Имитационное моделирование</h4>
             <p>Практическое использование разработанных моделей и алгоритмов без достаточной проверки их работы на материальных объектах может привести к авариям и значительным финансовым потерям. Поэтому необходимо перед внедрением в практику провести имитационное моделирование.</p>
-            <p>Кроме самой системы разработан генератор тестовых данных. <a href="">Ознакомиться можно по ссылке</a></p>
+            <p>Кроме самой системы разработан генератор тестовых данных. <a href="https://github.com/Dosant/Pipeline-control-system/tree/master/generator">Ознакомиться можно по ссылке</a></p>
           </BigCard>
       </div>
     );
