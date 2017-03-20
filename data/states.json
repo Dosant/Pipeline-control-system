@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "name": "Хорошее",
+    "adj": "Хороший",
+    "max": 0.25,
+    "min": 0,
+    "color": "#7AC29A",
+    "icon": "fa fa-check",
+    "action": "Продолжить работу"
+  },
+  {
+    "id": "2",
+    "name": "Нормальное",
+    "adj": "Нормальный",
+    "max": 0.5,
+    "min": 0.25,
+    "color": "#7AC29A",
+    "icon": "fa fa-check",
+    "action": "Продолжить работу"
+  },
+  {
+    "id": "3",
+    "name": "Аварийное",
+    "adj": "Аварийный",
+    "max": 0.75,
+    "min": 0.5,
+    "color": "#F3BB45",
+    "icon": "fa fa-exclamation-triangle",
+    "action": "Ремонтировать",
+    "notifyLevel": 1
+  },
+  {
+    "id": "4",
+    "name": "Критическое",
+    "adj": "Критический",
+    "max": 1,
+    "min": 0.75,
+    "color": "#EB5E28",
+    "icon": "fa fa-exclamation-triangle",
+    "action": "Остановить работу. Провести капитальный ремонт",
+    "notifyLevel": 2
+  }
+]

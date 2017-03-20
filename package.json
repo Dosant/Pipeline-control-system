@@ -1,0 +1,32 @@
+{
+  "name": "scs",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.15.2",
+    "faker": "^4.1.0",
+    "moment": "^2.17.1",
+    "rc-tooltip": "^3.4.2",
+    "react": "^15.4.2",
+    "react-addons-shallow-compare": "^15.4.2",
+    "react-dates": "^8.2.1",
+    "react-dom": "^15.4.2",
+    "react-mapbox-gl": "^1.4.0",
+    "react-router": "3.0.2",
+    "react-select": "^1.0.0-rc.3",
+    "synaptic": "^1.0.10"
+  },
+  "devDependencies": {
+    "eslint-config-standard": "^7.0.1",
+    "eslint-config-standard-react": "^4.3.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-react": "^6.10.0",
+    "eslint-plugin-standard": "^2.1.1",
+    "react-scripts": "0.9.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  }
+}
