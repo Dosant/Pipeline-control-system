@@ -59,7 +59,7 @@ class Page extends Component {
               </div>
               <div className="col-xs-10">
                 <h4 className="no-top-margin">
-                  Состояние: {currentState.stateClass.name}
+                  Состояние трубопровода: {currentState.stateClass.name}
                 </h4>
                 <h5 style={{margin: 0}}>{currentState.stateClass.action}</h5>
                 <h6 style={{margin: 0}}>
@@ -73,7 +73,7 @@ class Page extends Component {
                 <hr />
                 <div className="row" style={{marginTop: '36px'}}>
                   <div className="col-xs-12">
-                    <h4 className="title">Проблемные участки:</h4>
+                    <h4 className="title">Аварийные участки:</h4>
                     <TableListBody data={currentState.criticalDataArray} />
                   </div>
                 </div>

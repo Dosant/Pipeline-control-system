@@ -1,0 +1,42 @@
+.Menu .menu-container{
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+}
+
+.Menu .box{
+  flex: 1 0 calc(50%);
+  width: 50%;
+  background: #66615B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.Menu .box:hover {
+  opacity: .85;
+}
+
+.Menu .content,
+.Menu .content>p {
+  color: white;
+  font-size: 3rem;
+}
+
+.Menu .box:after{
+  content: '';
+  display: block;
+  /*padding-bottom: 100%;*/
+}
+
+.Menu .fa {
+  font-size: 6rem;
+  width: 100%;
+}
+
+.Menu .box2{background: #7A9E9F;}
+.Menu .box3{background: #68B3C8;}
+.Menu .box4{background: #7AC29A;}

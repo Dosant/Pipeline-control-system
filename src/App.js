@@ -9,6 +9,7 @@ import Alert from './Containers/Alert';
 import Help from './Containers/Help';
 import About from './Containers/About';
 import Settings from './Containers/Settings';
+import Menu from './Menu';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import './App.css';
 
@@ -41,6 +42,8 @@ class App extends Component {
           <Router path="help" component={Help} />
           <Router path="about" component={About} />
           <Router path="settings" component={Settings} />
+        </Route>
+        <Route path="/menu" component={Menu}>
         </Route>
       </Router>
     );

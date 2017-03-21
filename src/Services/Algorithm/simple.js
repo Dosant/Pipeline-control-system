@@ -1,10 +1,13 @@
-import {fuzzificationIsolation, fuzzificationPower, fuzzificationResistance} from './helpers/fuzzification';
+import {
+  fuzzificationIsolation,
+  fuzzificationPower,
+  fuzzificationResistance,
+} from './helpers/fuzzification';
 
 import {uncertainty} from './helpers/uncertainty';
 import {filtration} from './helpers/filtration';
 import {identify} from './helpers/identification';
 import {getMessage} from './helpers/message';
-
 
 /*
   {"data":{"isolation":"4.35","resistance":"99.61","power":"22.46"},"info":{"id":"1aq5me","name":"element_5","geo":{"latitude":42.04461012118509,"longitude":61.013697393738425}},"date":1489856012735}
@@ -41,11 +44,18 @@ export function identifyStateOfData(input, states) {
   /*
     5. Выбор соответсвующего класса состояния и управления
   */
-  const elementStateClassIndex = states.findIndex(state => {
-    return elementState <= state.max && elementState >= state.min;
-  });
 
-  const elementStateClass = states[elementStateClassIndex];
+  function getStateClass(elementState) {
+    const _elementStateClassIndex = states.findIndex(state => {
+      return elementState <= state.max && elementState >= state.min;
+    });
+
+    const _elementStateClass = states[_elementStateClassIndex];
+
+    return {elementStateClassIndex: _elementStateClassIndex, elementStateClass: _elementStateClass};
+  }
+
+  const {elementStateClassIndex, elementStateClass} = getStateClass(elementState);
 
   /*
     6. Формирования прогноза
@@ -73,14 +83,30 @@ export function identifyStateOfData(input, states) {
     message: message.message,
     shortMessage: message.shortMessage,
     criticalProperty,
-    isCritical: elementStateClassIndex > 1
+    isCritical: elementStateClassIndex > 1,
+    fuzzificatedData: {
+      isolation: {
+        state: isolation.toFixed(2),
+        stateClass: getStateClass(isolation).elementStateClass
+      },
+      resistance: {
+        state: resistance.toFixed(2),
+        stateClass: getStateClass(resistance).elementStateClass
+      },
+      power: {
+        state: power.toFixed(2),
+        stateClass: getStateClass(power).elementStateClass
+      }
+    },
   };
 }
 
 /* Состояние системы - худшее состояние узла */
 export function identifyStateOfSystem(data) {
   data.data.sort((a, b) => b.state - a.state);
-  const criticalDataArray = data.data.filter(({stateClass}) => stateClass.id === '3' || stateClass.id === '4');
+  const criticalDataArray = data.data.filter(
+    ({stateClass}) => stateClass.id === '3' || stateClass.id === '4',
+  );
   const criticalData = data.data[0];
   const state = criticalData.state;
   const stateClass = criticalData.stateClass;
@@ -88,6 +114,6 @@ export function identifyStateOfSystem(data) {
     state,
     stateClass,
     criticalData,
-    criticalDataArray
-  }
+    criticalDataArray,
+  };
 }

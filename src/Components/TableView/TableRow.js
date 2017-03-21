@@ -21,6 +21,14 @@ const icon = stateClass => {
   );
 };
 
+const renderState = ({state, stateClass}) => {
+  if (stateClass.id === '3' || stateClass.id === '4') {
+    return (<span style={{backgroundColor: stateClass.color, color: '#fff'}}>{state}</span>);
+  } else {
+    return (<span>{state}</span>);
+  }
+}
+
 const TableRow = ({data}) => {
   return (
     <tr>
@@ -33,10 +41,10 @@ const TableRow = ({data}) => {
         </Link>
       </td>
       <td>{formatDate(data.date)}</td>
-      <td>{data.data.isolation}</td>
-      <td>{data.data.resistance}</td>
-      <td>{data.data.power}</td>
-      <td style={{cursor: 'pointer'}}><Tooltip placement="left" trigger={['hover']} overlay={<span>{data.shortMessage}</span>}><span>{icon(data.stateClass)} {data.stateClass.adj}</span></Tooltip></td>
+      <td>{data.data.isolation} ({renderState(data.fuzzificatedData.isolation)})</td>
+      <td>{data.data.resistance} ({renderState(data.fuzzificatedData.resistance)})</td>
+      <td>{data.data.power} ({renderState(data.fuzzificatedData.power)})</td>
+      <td style={{cursor: 'pointer'}}><Tooltip placement="left" trigger={['hover']} overlay={<span>{data.shortMessage}</span>}><span>{icon(data.stateClass)} {data.stateClass.adj} ({data.state.toFixed(2)})</span></Tooltip></td>
     </tr>
   );
 };
