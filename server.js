@@ -7,3 +7,4 @@ app.listen(port, () => {
 
 app.use('/data', express.static('data/'));
 app.use('/', express.static('build/'));
+app.use('/*', express.static('build/index.html'));
