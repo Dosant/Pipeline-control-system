@@ -27,7 +27,7 @@ class Page extends Component {
   constructor() {
     super();
     this.state = {
-      top: 10,
+      top: 10
     };
 
     this.handleNextPage = this.handleNextPage.bind(this);
