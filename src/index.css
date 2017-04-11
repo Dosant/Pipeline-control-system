@@ -22,3 +22,29 @@
 .navbar .navbar-nav > li > a i {
   margin-right: 4px;
 }
+
+.StateBlocks {
+  padding-left: 5px;
+  padding-right: 5px;
+
+  color: #fff;
+}
+
+.StateBlocks hr {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.StateBlocks a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.StateBlocks__item {
+  background-color: green;
+  padding: 8px;
+  padding-top: 0;
+
+  margin-left: -5px;
+  margin-right: -5px;
+}

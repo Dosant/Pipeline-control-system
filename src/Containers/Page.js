@@ -6,7 +6,9 @@ import moment from 'moment';
 
 import {TableListBody} from '../Components/TableView/TableList';
 import {BigCard, SmallCard} from '../Components/Cards';
+import StateBlocks from '../Components/StateBlocks';
 const {currentState, previousStates} = getSystemState();
+
 
 
 const formatDate = ts => moment(ts).format('L : LTS');
@@ -78,6 +80,15 @@ class Page extends Component {
                   </div>
                 </div>
               </div>}
+            <div>
+                <hr />
+                <div className="row" style={{marginTop: '36px'}}>
+                  <div className="col-xs-12">
+                    <h4 className="title">Все участки:</h4>
+                    <StateBlocks data={currentState.data}/>
+                  </div>
+                </div>
+              </div>
             <div>
               <hr />
               <div className="row" style={{marginTop: '36px'}}>

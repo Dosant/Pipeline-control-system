@@ -61,7 +61,7 @@ const Header = ({router}) => {
               </Link>
             </li>
             <li>
-              <a>v0.1</a>
+              <a>v0.2</a>
             </li>
           </ul>
 
