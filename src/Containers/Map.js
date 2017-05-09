@@ -1,7 +1,11 @@
+//@flow
 import React, {Component} from 'react';
 import {withRouter} from 'react-router';
 import MapboxWrapper from '../Components/MapboxWrapper';
-import {getGeoData, getElements, getElementById} from '../Services/Data';
+import {getElementsWithState} from '../api/elements';
+import type {ElementWithState} from '../Types/data';
+import geoData from '../../data/geo.pipe.json';
+
 
 const BigCard = ({title, date, children}) => {
   return (
@@ -20,24 +24,38 @@ const BigCard = ({title, date, children}) => {
 };
 
 class Map extends Component {
+  state: {
+    isLoading: boolean,
+    element?: ElementWithState,
+    elements?: Array<ElementWithState>
+  };
+
+  initialElementId: string;
+
   constructor(props) {
     super(props);
     this.state = {
-      element: null,
+      isLoading: true
     };
 
     if (props.router) {
       const {
-        element: elementId,
+        element: elementId
       } = props.router.getCurrentLocation().query;
-      const element = getElementById(elementId);
-      if (element) {
-        this.state = {
-          element,
-        };
-      }
+      this.initialElementId = elementId;
     }
   }
+
+  componentDidMount() {
+    getElementsWithState(3).then((elements: Array<ElementWithState>) => {
+      this.setState({
+        isLoading: false,
+        elements,
+        element: elements.find((element:ElementWithState) => element._id === this.initialElementId)
+      });
+    });
+  }
+
   render() {
     return (
       <div className="row">
@@ -45,11 +63,13 @@ class Map extends Component {
           title={'Карта трубопровода: Сейчас'}
           date={'Данные представлены в реальном времени'}
         >
-          <MapboxWrapper
-            geojson={getGeoData()}
-            elements={getElements()}
-            initialElement={this.state.element}
-          />
+          {this.state.isLoading
+            ? <span>Загрузка ... </span>
+            : <MapboxWrapper
+                geojson={geoData}
+                elements={this.state.elements}
+                initialElement={this.state.element}
+              />}
         </BigCard>
       </div>
     );

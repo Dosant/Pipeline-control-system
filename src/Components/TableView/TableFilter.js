@@ -1,56 +1,136 @@
+// @flow
 import React, {Component} from 'react';
+import type {Element, State} from '../../Types/data';
 import {DateRangePicker} from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
-import {getElements} from '../../Services/Data';
-import {getStates} from '../../Services/State';
+import {getStates} from '../../api/states';
+import {getElements} from '../../api/elements';
 
-const elementsForSelect = getElements().map(element => {
-  return {
-    value: element.id,
-    label: element.name,
-    original: element,
-  };
-});
+type ElementForSelect = {
+  value: string,
+  label: string,
+  original: Element
+};
 
-const statesForSelect = getStates().map(state => {
-  return {
-    value: state.id,
-    label: state.adj,
-    original: state,
+type StateForSelect = {
+  value: string,
+  label: string,
+  original: State
+};
+
+const getElementsForSelect = (elements: Array<Element>): Array<ElementForSelect> => {
+  return elements.map((element: Element) => {
+    return {
+      value: element._id,
+      label: element.name,
+      original: element
+    };
+  });
+};
+
+const getStatesForSelect = (states: Array<State>): Array<StateForSelect> => {
+  return states.map((state: State) => {
+    return {
+      value: state._id,
+      label: state.name,
+      original: state
+    };
+  });
+};
+
+class TableFilterPreloadWrapper extends Component {
+  state: {
+    isLoading: boolean,
+    elements?: Array<Element>,
+    states?: Array<State>
   };
-});
+
+  props: {
+    onApplyFilter: (filterConfig: Object) => void,
+    initialFilterConfigElementId: string
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true
+    };
+  }
+
+  componentDidMount() {
+    Promise.all([getStates(), getElements()]).then((
+      [states, elements]: [Array<State>, Array<Element>]
+    ) => {
+      this.setState({
+        isLoading: false,
+        states,
+        elements
+      });
+    });
+  }
+
+  render() {
+    if (this.state.isLoading) {
+      return <span>Загрузка ... </span>;
+    } else {
+      if (this.state.elements !== undefined) {
+        const elements = getElementsForSelect(this.state.elements);
+        if (this.state.states !== undefined) {
+          const states = getStatesForSelect(this.state.states);
+          const initialFilterConfig = {};
+          if (this.props.initialFilterConfigElementId) {
+            const initialElement = elements.find((element) => element.original._id === this.props.initialFilterConfigElementId);
+            initialFilterConfig.elements = [initialElement];
+          }
+          return (
+            <TableFilter elements={elements} states={states} onApplyFilter={this.props.onApplyFilter} initialFilterConfig={initialFilterConfig} />
+          );
+        }
+      }
+    }
+
+    return <span>Smth went wrong</span>;
+  }
+}
+
+type TableFilterProps = {
+  elements: Array<ElementForSelect>,
+  states: Array<StateForSelect>,
+  onApplyFilter: (filterConfig: Object) => void,
+  initialFilterConfig: Object
+}
 
 class TableFilter extends Component {
-  constructor(props) {
+  props: TableFilterProps
+
+  constructor(props: TableFilterProps) {
     super(props);
 
     // TODO: Cover not only initialFilterConfig.elements filter with length === 1;
-    let elemets;
+    let elements;
     const initialFilterConfig = props.initialFilterConfig;
-    if (initialFilterConfig.elements && initialFilterConfig.elements[0]) {
-      const elementId = initialFilterConfig.elements[0].id;
-      const element = elementsForSelect.find((element) => element.value === elementId);
-      elemets = [element];
+    if (initialFilterConfig.elements) {
+      elements = initialFilterConfig.elements;
     }
 
     this.state = {
       focusedInput: null,
       startDate: null,
       endDate: null,
-      stateLevel: statesForSelect[0].value,
-      elements: elemets || [],
+      stateLevel: props.states[0].value,
+      elements: elements || []
     };
 
-    this.onDateChange = this.onDateChange.bind(this);
-    this.onFocusChange = this.onFocusChange.bind(this);
-    this.onStateLevelChange = this.onStateLevelChange.bind(this);
-    this.onElementsChange = this.onElementsChange.bind(this);
-    this.applyFilter = this.applyFilter.bind(this);
-    this.resetFilter = this.resetFilter.bind(this);
+    (this:any).onDateChange = this.onDateChange.bind(this);
+    (this:any).onFocusChange = this.onFocusChange.bind(this);
+    (this:any).onStateLevelChange = this.onStateLevelChange.bind(this);
+    (this:any).onElementsChange = this.onElementsChange.bind(this);
+    (this:any).applyFilter = this.applyFilter.bind(this);
+    (this:any).resetFilter = this.resetFilter.bind(this);
   }
 
   applyFilter() {
@@ -58,21 +138,21 @@ class TableFilter extends Component {
     if (this.state.startDate || this.state.endDate) {
       filterConfig.date = {
         start: +this.state.startDate || new Date(0).getTime(),
-        end: +this.state.endDate || new Date().getTime(),
+        end: +this.state.endDate || new Date().getTime()
       };
     }
 
     if (this.state.stateLevel) {
       filterConfig.state = !this.state.stateLevel
-        ? statesForSelect[0].original
-        : statesForSelect.find(
-            state => state.value === this.state.stateLevel,
+        ? this.props.states[0].original
+        : this.props.states.find(
+            state => state.value === this.state.stateLevel
           ).original;
     }
 
     if (this.state.elements && this.state.elements.length) {
       filterConfig.elements = this.state.elements.map(
-        element => element.original,
+        element => element.original
       );
     }
 
@@ -85,25 +165,25 @@ class TableFilter extends Component {
         focusedInput: null,
         startDate: null,
         endDate: null,
-        stateLevel: statesForSelect[0].value,
-        elements: [],
+        stateLevel: this.props.states[0].value,
+        elements: []
       },
       () => {
         this.applyFilter();
-      },
+      }
     );
   }
 
   onDateChange({startDate, endDate}) {
     this.setState({
       startDate,
-      endDate,
+      endDate
     });
   }
 
   onFocusChange(focus) {
     this.setState({
-      focusedInput: focus,
+      focusedInput: focus
     });
   }
 
@@ -113,13 +193,13 @@ class TableFilter extends Component {
 
   onStateLevelChange(newState) {
     this.setState({
-      stateLevel: (newState && newState.value) || null,
+      stateLevel: (newState && newState.value) || null
     });
   }
 
   onElementsChange(newElements) {
     this.setState({
-      elements: newElements || [],
+      elements: newElements || []
     });
   }
 
@@ -147,7 +227,7 @@ class TableFilter extends Component {
           <label>Состояние узла: минимальный уровень</label>
           <Select
             value={this.state.stateLevel}
-            options={statesForSelect}
+            options={this.props.states}
             onChange={this.onStateLevelChange}
             clearable={false}
             noResultsText={'Уровень не найден'}
@@ -159,7 +239,7 @@ class TableFilter extends Component {
           <Select
             multi={true}
             value={this.state.elements}
-            options={elementsForSelect}
+            options={this.props.elements}
             onChange={this.onElementsChange}
             noResultsText={'Узел не найден'}
             placeholder={'Выберите узлы трубопровода'}
@@ -186,4 +266,4 @@ class TableFilter extends Component {
   }
 }
 
-export default TableFilter;
+export default TableFilterPreloadWrapper;

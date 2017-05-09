@@ -58,5 +58,14 @@
 
 .block-link {
   display: block;
+}
 
+
+.recharts-responsive-container {
+  min-height: 640px;
+}
+
+.pie-chart-container .recharts-responsive-container,
+.bar-chart-container .recharts-responsive-container {
+  min-height: 400px;
 }

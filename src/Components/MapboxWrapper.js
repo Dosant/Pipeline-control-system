@@ -6,7 +6,7 @@ import ReactMapboxGl, {
   Popup,
   GeoJSONLayer,
   ScaleControl,
-  ZoomControl,
+  ZoomControl
 } from 'react-mapbox-gl';
 import moment from 'moment';
 
@@ -22,11 +22,12 @@ const icon = stateClass => {
   );
 };
 
-const elementToGeoArray = (elem) => elem ? [elem.geo.latitude, elem.geo.longitude] : null;
+const elementToGeoArray = elem =>
+  elem ? [elem.geo.latitude, elem.geo.longitude] : null;
 
 const containerStyle = {
   height: `calc(100vh - 200px)`,
-  width: '100%',
+  width: '100%'
 };
 
 const defaultCenter = [42.04589641453336, 61.0912082111052];
@@ -37,12 +38,11 @@ const style = 'mapbox://styles/mapbox/light-v9';
 class MapboxWrapper extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       popup: null,
       center: elementToGeoArray(props.initialElement) || defaultCenter,
       zoom: [11],
-      element: props.initialElement || null,
+      element: props.initialElement || null
     };
 
     this.onDrag = this.onDrag.bind(this);
@@ -51,7 +51,7 @@ class MapboxWrapper extends Component {
   onDrag() {
     if (this.state.element) {
       this.setState({
-        element: null,
+        element: null
       });
     }
   }
@@ -60,7 +60,7 @@ class MapboxWrapper extends Component {
     this.setState({
       center: feature.geometry.coordinates,
       zoom: [12],
-      element,
+      element
     });
   }
 
@@ -86,12 +86,12 @@ class MapboxWrapper extends Component {
           data={geojson}
           lineLayout={{
             'line-cap': 'round',
-            'line-join': 'round',
+            'line-join': 'round'
           }}
           linePaint={{
             'line-opacity': 0.75,
             'line-color': '#333',
-            'line-width': 2,
+            'line-width': 2
           }}
         />
         {elements.map(element => {
@@ -100,8 +100,8 @@ class MapboxWrapper extends Component {
 
         {element &&
           <Popup
-            key={`element-popup-${element.id}`}
-            offset={[0, -50]}
+            key={`element-popup-${element._id}`}
+            offset={[200, 0]}
             coordinates={elementToGeoArray(element)}
           >
             {this.renderPopup(element)}
@@ -115,17 +115,21 @@ class MapboxWrapper extends Component {
     return (
       <div>
         <h5>Узел: {element.name}</h5>
-        <h6>Последние показания:</h6>
+        <h6 style={{marginBottom: '4px'}}>Последние показания:</h6>
         <ol>
           {element.lastData.map((data, index) => {
             return (
               <li key={index}>
-                <span>{icon(data.stateClass)} {data.state} : {formatDate(data.date)}</span>
+                <span>
+                  {icon(data.stateClass)} {data.state} : {formatDate(data.date)}
+                </span>
               </li>
             );
           })}
         </ol>
-        <Link to={{ pathname: '/browse', query: { element: element.id } }}>Подробнее...</Link>
+        <Link to={{pathname: '/browse', query: {element: element._id}}}>
+          Подробнее...
+        </Link>
       </div>
     );
   }
@@ -138,11 +142,11 @@ class MapboxWrapper extends Component {
       (
         <Layer
           type="circle"
-          key={`element-circle-${element.id}`}
-          id={`element-circle-${element.id}`}
+          key={`element-circle-${element._id}`}
+          id={`element-circle-${element._id}`}
           paint={{
             'circle-radius': getRadius(element.lastState),
-            'circle-color': element.lastStateClass.color,
+            'circle-color': element.lastStateClass.color
           }}
         >
           <Feature
@@ -154,22 +158,20 @@ class MapboxWrapper extends Component {
       (
         <Layer
           type="symbol"
-          key={`element-name-${element.id}`}
-          id={`element-name-${element.id}`}
+          key={`element-name-${element._id}`}
+          id={`element-name-${element._id}`}
           layout={{
             'text-field': element.name,
             'text-offset': [1, 0.5],
-            'text-anchor': 'top',
+            'text-anchor': 'top'
           }}
           paint={{
-            'text-color': '#333',
+            'text-color': '#333'
           }}
         >
-          <Feature
-            coordinates={elementToGeoArray(element)}
-          />
+          <Feature coordinates={elementToGeoArray(element)} />
         </Layer>
-      ),
+      )
     ];
   }
 }

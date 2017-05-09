@@ -1,6 +1,8 @@
+// @flow;
 import React from 'react';
 import TableRow from './TableRow';
 import Tooltip from 'rc-tooltip';
+import type {Data} from '../../Types/data';
 
 const TooltipWrapper = ({message, children}) => {
   return (
@@ -8,7 +10,7 @@ const TooltipWrapper = ({message, children}) => {
   );
 }
 
-export function TableListBody({data}) {
+export function TableListBody({dataSet}: {dataSet: Array<Data>}) {
   return (
     <div className="content table-responsive table-full-width">
       <table className="table table-striped">
@@ -25,8 +27,8 @@ export function TableListBody({data}) {
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => {
-            return <TableRow key={index} data={item} />;
+          {dataSet.map((item: Data) => {
+            return <TableRow key={item._id} data={item} />;
           })}
         </tbody>
       </table>
@@ -34,7 +36,7 @@ export function TableListBody({data}) {
   );
 };
 
-const TableList = ({data, filterComponent}) => {
+const TableList = ({dataSet, filterComponent}: {dataSet: Array<Data>, filterComponent: React.Component}) => {
   return (
     <div className="row">
       <div className="col-md-12">
@@ -46,8 +48,8 @@ const TableList = ({data, filterComponent}) => {
             </p>
             {filterComponent}
           </div>
-          {data.length > 0
-            ? <TableListBody data={data} />
+          {dataSet.length > 0
+            ? <TableListBody dataSet={dataSet} />
             : <div className="TableView__empty">
                 <p>По выбранному фильтру данных не найдено</p>
               </div>}

@@ -1,17 +1,14 @@
+// @flow
 import React, {Component} from 'react';
 import {BigCard} from '../Components/Cards';
-import {getSystemState} from '../Services/Data';
+import {getSystemStates} from '../api/states';
 import {Link} from 'react-router';
 import moment from 'moment';
 import {TableListBody} from '../Components/TableView/TableList';
 
-const {systemState} = getSystemState();
-const crtiticalSystemStates = systemState.filter(({stateClass}) => {
-  return stateClass.id === '3' || stateClass.id === '4'
-});
-
-
-const formatDate = ts => moment(ts).format('L : LTS');
+const formatDate = ({from, to}) => {
+  return `${moment(from).format('L : LTS')} - ${moment(to).format('L : LTS')}`;
+};
 
 const icon = stateClass => {
   return (
@@ -23,22 +20,50 @@ const icon = stateClass => {
   );
 };
 
+function unwrap<T>(val: ?T): T {
+  if (val == null) throw new Error();
+  return val;
+}
+
 class Alert extends Component {
+  state: {
+    top: number,
+    nextSkip: number,
+    isLoading: boolean,
+    systemStates?: Array<Object>
+  };
+
   constructor() {
     super();
     this.state = {
-      top: 10,
+      top: 5,
+      nextSkip: 0,
+      isLoading: true
     };
-    this.handleNextPage = this.handleNextPage.bind(this);
+    (this:any).handleNextPage = this.handleNextPage.bind(this);
+    (this:any).loadNext = this.loadNext.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadNext();
   }
 
   handleNextPage() {
-    this.setState(prevState => {
-      prevState.top += 10;
-      return prevState;
-    });
+    this.loadNext();
   }
 
+  loadNext() {
+    return getSystemStates(true, this.state.top, this.state.nextSkip)
+      .then(({skip, result}: {skip: number, result: Array<Object>}) => {
+        this.setState(( prevState ) => {
+          return {
+            isLoading: false,
+            systemStates: prevState.systemStates ? prevState.systemStates.concat(result) : result,
+            nextSkip: skip + prevState.top
+          }
+        })
+      })
+  }
   render() {
     return (
       <div>
@@ -48,7 +73,9 @@ class Alert extends Component {
           </div>
         </div>
         <div className="row">
-          {crtiticalSystemStates.slice(0, this.state.top).map((state, index) => {
+          {this.state.isLoading ?
+          (<span>Загрузка ... </span>) :
+          (unwrap(this.state.systemStates).map((state, index) => {
             return (
               <BigCard
                 key={index}
@@ -71,7 +98,7 @@ class Alert extends Component {
                     <div className="row" style={{marginTop: '36px'}}>
                       <div className="col-xs-12">
                         <h4 className="title">Причина:</h4>
-                        <TableListBody data={state.criticalDataArray} />
+                        <TableListBody dataSet={state.criticalDataArray} />
                       </div>
                     </div>
                     <hr />
@@ -95,8 +122,8 @@ class Alert extends Component {
                   </div>
                 </div>
               </BigCard>
-            );
-          })}
+            )
+          }))}
         </div>
         <div style={{textAlign: 'center'}}>
           <button className="btn" onClick={this.handleNextPage}>

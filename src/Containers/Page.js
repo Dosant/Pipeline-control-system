@@ -1,17 +1,16 @@
+// @flow
 import React, {Component} from 'react';
-import {getSystemState} from '../Services/Data';
+import {getSystemStates} from '../api/states';
 import {Link} from 'react-router';
 import moment from 'moment';
-
 
 import {TableListBody} from '../Components/TableView/TableList';
 import {BigCard, SmallCard} from '../Components/Cards';
 import StateBlocks from '../Components/StateBlocks';
-const {currentState, previousStates} = getSystemState();
 
-
-
-const formatDate = ts => moment(ts).format('L : LTS');
+const formatDate = ({from, to}) => {
+  return `${moment(from).format('L : LTS')} - ${moment(to).format('L : LTS')}`;
+};
 
 const icon = stateClass => {
   return (
@@ -22,25 +21,77 @@ const icon = stateClass => {
     />
   );
 };
+type State = {
+  isLoading: boolean,
+  top: number,
+  skip: number,
+  systemStates: Array<Object>
+};
 
 class Page extends Component {
+  state: State;
+
   constructor() {
     super();
     this.state = {
-      top: 10
+      skip: 0,
+      top: 5,
+      isLoading: true,
+      systemStates: []
     };
 
-    this.handleNextPage = this.handleNextPage.bind(this);
+    (this: any).handleNextPage = this.handleNextPage.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadNext();
   }
 
   handleNextPage() {
-    this.setState(prevState => {
-      prevState.top += 10;
-      return prevState;
+    this.loadNext();
+  }
+
+  loadNext() {
+    return getSystemStates(false, this.state.top, this.state.skip).then((
+      result: Array<Object>
+    ) => {
+      this.setState(prevState => {
+        return {
+          isLoading: false,
+          systemStates: prevState.systemStates.concat(result),
+          skip: prevState.skip + prevState.top
+        };
+      });
     });
   }
 
   render() {
+    if (this.state.isLoading) {
+      return (
+        <div>
+          <div className="row">
+            <div className="col-xs-12">
+              <h3 className="title">Сейчас</h3>
+            </div>
+          </div>
+          <div className="row">
+            <BigCard
+              title={'Отчет о состоянии системы'}
+              date={formatDate(Date.now())}
+            >
+              Загрузка
+            </BigCard>
+          </div>
+        </div>
+      );
+    }
+
+    const currentState = this.state.systemStates.slice(0, 1)[0];
+    const previousStates = this.state.systemStates.slice(
+      1,
+      this.state.systemStates.length
+    );
+
     return (
       <div>
         <div className="row">
@@ -63,32 +114,34 @@ class Page extends Component {
                 <h4 className="no-top-margin">
                   Состояние трубопровода: {currentState.stateClass.name}
                 </h4>
-                <h5 style={{margin: 0}}>{currentState.stateClass.action}</h5>
+                <h5 style={{margin: 0}}>
+                  {currentState.stateClass.action.message}
+                </h5>
                 <h6 style={{margin: 0}}>
                   {currentState.criticalData.shortMessage}
                 </h6>
               </div>
             </div>
-            {(currentState.stateClass.id === '3' ||
-              currentState.stateClass.id === '4') &&
+            {(currentState.stateClass._id === '3' ||
+              currentState.stateClass._id === '4') &&
               <div>
                 <hr />
                 <div className="row" style={{marginTop: '36px'}}>
                   <div className="col-xs-12">
                     <h4 className="title">Аварийные участки:</h4>
-                    <TableListBody data={currentState.criticalDataArray} />
+                    <TableListBody dataSet={currentState.criticalDataArray} />
                   </div>
                 </div>
               </div>}
             <div>
-                <hr />
-                <div className="row" style={{marginTop: '36px'}}>
-                  <div className="col-xs-12">
-                    <h4 className="title">Все участки:</h4>
-                    <StateBlocks data={currentState.data}/>
-                  </div>
+              <hr />
+              <div className="row" style={{marginTop: '36px'}}>
+                <div className="col-xs-12">
+                  <h4 className="title">Все участки:</h4>
+                  {<StateBlocks data={currentState.currentDataSet}/>}
                 </div>
               </div>
+            </div>
             <div>
               <hr />
               <div className="row" style={{marginTop: '36px'}}>
@@ -110,7 +163,7 @@ class Page extends Component {
           </div>
         </div>
         <div className="row">
-          {previousStates.slice(0, this.state.top).map((state, index) => {
+          {previousStates.map((state, index) => {
             return (
               <BigCard
                 key={index}
@@ -128,7 +181,8 @@ class Page extends Component {
                       Состояние: {state.stateClass.name}
                     </h4>
                     <h5 style={{margin: 0}}>
-                      {state.stateClass.action}
+                      {state.stateClass.action &&
+                        state.stateClass.action.message}
                     </h5>
                     <h6 style={{margin: 0}}>
                       {state.criticalData.shortMessage}
@@ -145,14 +199,20 @@ class Page extends Component {
                     </div>
                   </div>
                 </div>
-                {/*<hr />
-                <div className="row" style={{marginTop: '36px'}}>
-                  <div className="col-xs-12">
-                    <h4 className="title">Проблемные участки:</h4>
-                    <TableListBody data={currentState.criticalDataArray} />
-                  </div>
-                </div>*/
-                }
+                <hr />
+                {state.criticalDataArray.length
+                  ? <div className="row" style={{marginTop: '36px'}}>
+                      <div className="col-xs-12">
+                        <h4 className="title">Проблемные участки:</h4>
+                        <TableListBody dataSet={state.criticalDataArray} />
+                      </div>
+                    </div>
+                  : <div className="row" style={{marginTop: '36px'}}>
+                      <div className="col-xs-12">
+                        <h4 className="title" style={{marginBottom: '36px'}}>Проблемных участков нет</h4>
+                      </div>
+                    </div>}
+
               </BigCard>
             );
           })}

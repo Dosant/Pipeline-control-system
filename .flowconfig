@@ -1,0 +1,9 @@
+[ignore]
+.*/server/.*
+./generator/.*
+./build/.*
+[include]
+
+[libs]
+
+[options]

@@ -1,0 +1,3 @@
+{
+  "mongoUrl": "mongodb://admin:admin@ds141368.mlab.com:41368/heroku_k6brzdnb"
+}
