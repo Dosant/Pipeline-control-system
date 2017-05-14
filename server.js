@@ -20,7 +20,13 @@ const db = mongoose.connect(mongoUrl);
 mongoose.connection.on('connected', function() {
   console.log('Mongoose default connection open to ' + mongoUrl);
   const {preloadStates} = require('./server/services/state');
-  preloadStates();
+  preloadStates()
+    .then(() => {
+      const args = require('minimist')(process.argv.slice(2));
+      if (args.isTraining) {
+        require('./training');
+      }
+    });
 });
 
 mongoose.connection.on('error', function(err) {

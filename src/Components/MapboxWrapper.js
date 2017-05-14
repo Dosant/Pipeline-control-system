@@ -177,3 +177,133 @@ class MapboxWrapper extends Component {
 }
 
 export default MapboxWrapper;
+
+export class MiniMap extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      popup: null,
+      center: defaultCenter,
+      zoom: [11],
+      element: null
+    };
+
+    this.onDrag = this.onDrag.bind(this);
+  }
+
+  onDrag() {
+    if (this.state.element) {
+      this.setState({
+        element: null
+      });
+    }
+  }
+
+  handleElementClick(element, {feature}) {
+    this.setState({
+      center: feature.geometry.coordinates,
+      zoom: [12],
+      element
+    });
+  }
+
+  render() {
+    const {geojson, elements} = this.props;
+    const {element} = this.state;
+
+    return (
+      <ReactMapboxGl
+        style={style}
+        accessToken={accessToken}
+        center={this.state.center}
+        movingMethod={'jumpTo'}
+        containerStyle={{
+          height: '400px',
+          width: '100%'
+        }}
+        zoom={[11]}
+        maxZoom={20}
+        minZoom={10}
+        onDrag={this.onDrag}
+      >
+        <ScaleControl />
+        <ZoomControl />
+        <GeoJSONLayer
+          data={geojson}
+          lineLayout={{
+            'line-cap': 'round',
+            'line-join': 'round'
+          }}
+          linePaint={{
+            'line-opacity': 0.75,
+            'line-color': '#333',
+            'line-width': 2
+          }}
+        />
+        {elements.map(element => {
+          return this.getLayersForElement(element);
+        })}
+
+        {element &&
+          <Popup
+            key={`element-popup-${element._id}`}
+            offset={[200, 0]}
+            coordinates={elementToGeoArray(element)}
+          >
+            {this.renderPopup(element)}
+          </Popup>}
+
+      </ReactMapboxGl>
+    );
+  }
+
+  renderPopup(element) {
+    return (
+      <div>
+        <h5>Узел: {element.name}</h5>
+      </div>
+    );
+  }
+
+  getLayersForElement(element) {
+    const getRadius = state => {
+      return 7;
+    };
+    return [
+      (
+        <Layer
+          type="circle"
+          key={`element-circle-${element._id}`}
+          id={`element-circle-${element._id}`}
+          paint={{
+            'circle-radius': getRadius(element.lastState),
+            'circle-color': '#68B3C8'
+          }}
+        >
+          <Feature
+            onClick={this.handleElementClick.bind(this, element)}
+            coordinates={elementToGeoArray(element)}
+          />
+        </Layer>
+      ),
+      (
+        <Layer
+          type="symbol"
+          key={`element-name-${element._id}`}
+          id={`element-name-${element._id}`}
+          layout={{
+            'text-field': element.name,
+            'text-offset': [1, 0.5],
+            'text-anchor': 'top'
+          }}
+          paint={{
+            'text-color': '#333'
+          }}
+        >
+          <Feature coordinates={elementToGeoArray(element)} />
+        </Layer>
+      )
+    ];
+  }
+}
+

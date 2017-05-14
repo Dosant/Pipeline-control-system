@@ -55,9 +55,15 @@ const Header = ({router}) => {
               </Link>
             </li>
             <li>
-              <Link to="/settings">
+              <Link to="/configuration">
                 <i className="ti-settings" />
-                <p>Настройки</p>
+                <p>Конфигурация</p>
+              </Link>
+            </li>
+             <li>
+              <Link to={{pathname: '/login', state: {user: null}}}>
+                <i className="ti-user" />
+                <p>Выйти</p>
               </Link>
             </li>
             <li>

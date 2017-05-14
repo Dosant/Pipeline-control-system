@@ -7,6 +7,7 @@ const dataSchema = new Schema({
   power: {type: Number, required: true},
   date: {type: Date, default: Date.now},
   element: {type: String, ref: 'Element'},
+  isCustom: {type: Boolean, default: false},
 
   state: {type: Number, required: true}
 })

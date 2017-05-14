@@ -5,11 +5,15 @@ const dataGenerator = require('./data');
 const faker = require('faker');
 
 module.exports = {
-  generateAndSaveElements,
+  generateAndSaveElements
 };
 
 /* Генератор элементов: Id, Name по Geo из { geoFilename } */
-function generateAndSaveElements(count = 1, geoFilename='data/geo.pipe.json' ,filename = 'data/elements.json') {
+function generateAndSaveElements(
+  count = 1,
+  geoFilename = 'data/geo.pipe.json',
+  filename = 'data/elements.json'
+) {
   const geoData = JSON.parse(fs.readFileSync(geoFilename).toString());
   const coordinates = geoData.geometry.coordinates;
   const elements = elementsGenerator.generateMany(coordinates);
@@ -17,7 +21,12 @@ function generateAndSaveElements(count = 1, geoFilename='data/geo.pipe.json' ,fi
 }
 
 /* Генератор показаний датчиков для элементов за последние {hours} часов с частотой {perHour} в час */
-function generateData(elements, badProbability = .5, hours = 7 * 24, perHour = 1) {
+function generateData(
+  elements,
+  badProbability = 0.5,
+  hours = 7 * 24,
+  perHour = 1
+) {
   const result = [];
 
   const end = moment();
@@ -46,18 +55,22 @@ function generateData(elements, badProbability = .5, hours = 7 * 24, perHour = 1
     });
   }
 
-  result.sort((a,b) => {
+  result.sort((a, b) => {
     return b.date - a.date;
   });
 
   return result;
 }
 
-function generateAndSaveData(badProbability, elementsFilename = 'data/elements.json', dataFilename = 'data/data.json') {
+function generateAndSaveData(
+  badProbability,
+  elementsFilename = 'data/elements.json',
+  dataFilename = 'data/data1.json'
+) {
   const elements = JSON.parse(fs.readFileSync(elementsFilename).toString());
   const data = generateData(elements, badProbability);
   fs.writeFileSync(dataFilename, JSON.stringify(data));
 }
 
 // generateAndSaveElements();
-generateAndSaveData(0.1);
+generateAndSaveData(0.5);

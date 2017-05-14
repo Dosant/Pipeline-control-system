@@ -5,5 +5,6 @@ router.use('/elements', require('./elements'));
 router.use('/states', require('./states'));
 
 router.use('/services', require('./services'));
+router.use('/realtime', require('./realtime'));
 
 module.exports = router;

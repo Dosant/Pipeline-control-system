@@ -44,12 +44,10 @@ function generateOne(info, date = new Date.now(), isBad = false) {
   }
 
   return {
-    data: {
-      isolation: isolation.toFixed(2),
-      resistance: resistance.toFixed(2),
-      power: power.toFixed(2),
-    },
-    info,
-    date: date.getTime(),
+    isolation: isolation.toFixed(2),
+    resistance: resistance.toFixed(2),
+    power: power.toFixed(2),
+    element: info,
+    date: date.getTime()
   };
 }

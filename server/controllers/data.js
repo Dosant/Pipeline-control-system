@@ -8,10 +8,16 @@ const moment = require('moment');
 
 module.exports = {
   addData,
+  addMultipleData,
   getData,
   recalcState,
-  getSystemState
+  getSystemState,
+  countData
 };
+
+function addMultipleData(dataSet) {
+  return pQueue(dataSet.map((data) => () => addData(data)));
+}
 
 function addData(dataDoc) {
   const data = new Data(dataDoc);
@@ -37,11 +43,16 @@ function getData(skip, top, filterConfig = {}) {
   }
 
   return Data.find(filterQuery)
+    .sort({date: -1})
     .skip(skip)
     .limit(top)
     .populate('element')
     .lean()
     .exec();
+}
+
+function countData() {
+  return Data.count();
 }
 
 function recalcState() {

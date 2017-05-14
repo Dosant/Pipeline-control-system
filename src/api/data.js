@@ -16,3 +16,17 @@ export function getData(
     return (result.data: Array<Data>);
   });
 }
+
+export function getDataCount():Promise<number> {
+  return axios.get(`/api/data/total`)
+    .then((result) => {
+      return (result.data: number);
+    })
+}
+
+export function postData(dataSet: Object):Promise<number> {
+  return axios.post(`/api/data`, dataSet)
+    .then((result) => {
+      return (result.data: number);
+    })
+}
