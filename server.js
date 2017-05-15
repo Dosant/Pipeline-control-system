@@ -3,9 +3,14 @@
 */
 const express = require('express');
 const app = express();
+const http = require('http');
 require('./server/config/express')(app);
 const port = process.env.PORT || 8100;
-app.listen(port, () => {
+
+const server = http.createServer(app);
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ server });
+server.listen(port, () => {
   console.log(`Express server listening on port ${port}`);
 });
 
@@ -43,7 +48,7 @@ process.on('SIGINT', function() {
 /*
   Routes config
 */
-app.use('/api', require('./server/routes'));
+app.use('/api', require('./server/routes')(wss));
 app.use('/data', express.static('data/'));
 app.use('/', express.static('build/'));
 app.use('/*', express.static('build/index.html'));
