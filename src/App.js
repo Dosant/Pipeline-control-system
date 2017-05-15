@@ -36,7 +36,9 @@ const Shell = ({children}) => {
 function setModeGlobally(state) {
   if (state && state.isDynamic) {
     window.isDynamic = true;
-  }  
+  } else {
+    window.isDynamic = false;
+  }
 }
 
 class App extends Component {

@@ -12,6 +12,20 @@ const TITLE_MAPPER = {
 const getTitle = router =>
   TITLE_MAPPER[router.getCurrentLocation().pathname] || TITLE_MAPPER['/'];
 
+const StatusIcon = ({isConnected}) => {
+  return isConnected
+    ? <i className="fa fa-circle text-success" />
+    : <i className="fa fa-circle text-danger" />;
+};
+
+const RenderStatus = () => {
+  if (window.isDynamic) {
+    return <span>Онлайн <StatusIcon isConnected /></span>
+  } else {
+    return <span>Оффлайн <StatusIcon isConnected={false} /></span>
+  }
+}
+
 const Header = ({router}) => {
   return (
     <nav className="navbar navbar-default">
@@ -23,7 +37,10 @@ const Header = ({router}) => {
             <span className="icon-bar bar2" />
             <span className="icon-bar bar3" />
           </button>
-          <a className="navbar-brand" href="#">{getTitle(router)}</a>
+          <Link to="/" className="navbar-brand">{getTitle(router)}</Link>
+          <span className="navbar-brand" style={{fontSize: '12px'}}>
+            <RenderStatus />
+          </span>
         </div>
         <div className="collapse navbar-collapse">
           <ul className="nav navbar-nav navbar-right">
@@ -41,7 +58,8 @@ const Header = ({router}) => {
                 <li><a href="#">Notification 4</a></li>
                 <li><a href="#">Another notification</a></li>
               </ul>
-            </li>*/}
+            </li>*/
+            }
             <li>
               <Link to="/help">
                 <i className="ti-help" />
@@ -60,7 +78,7 @@ const Header = ({router}) => {
                 <p>Конфигурация</p>
               </Link>
             </li>
-             <li>
+            <li>
               <Link to={{pathname: '/login', state: {user: null}}}>
                 <i className="ti-user" />
                 <p>Выйти</p>

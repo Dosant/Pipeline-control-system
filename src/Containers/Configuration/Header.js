@@ -5,7 +5,7 @@ const Header = () => (
   <nav className="navbar navbar-default" style={{backgroundColor: '#fff'}}>
     <div className="container-fluid">
       <div className="navbar-header">
-        <span className="navbar-brand">Система управления трубопроводом</span>
+        <Link to="/" className="navbar-brand">Система управления трубопроводом</Link>
       </div>
       <div className="collapse navbar-collapse">
         <ul className="nav navbar-nav navbar-right">
