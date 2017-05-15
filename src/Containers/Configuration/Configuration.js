@@ -172,7 +172,7 @@ class DynamicMode extends Component {
                 <div className="footer">
                   <hr />
                   <div className="stats">
-                    <a href="/">
+                    <a href="http://kot-1.herokuapp.com" target="_blank">
                       <i className="ti-pulse" />
                       {' '}Перейти к имитацинному модулю
                     </a>
@@ -352,7 +352,7 @@ class Configuration extends Component {
                   marginBottom: '32px'
                 }}
               >
-                <Link to="/" className="btn btn-info">
+                <Link to={{pathName: '/', state: {isDynamic: this.state.isDynamic}}} className="btn btn-info">
                   Перейти к работе с системой{' '}
                   <span
                     className="ti-arrow-right"

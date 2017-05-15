@@ -5,6 +5,8 @@ import {getSystemStates} from '../api/states';
 import {Link} from 'react-router';
 import moment from 'moment';
 import {TableListBody} from '../Components/TableView/TableList';
+import {registerForUpdates, shouldRegisterForUpdates} from '../api/realtime';
+
 
 const formatDate = ({from, to}) => {
   return `${moment(from).format('L : LTS')} - ${moment(to).format('L : LTS')}`;
@@ -32,6 +34,7 @@ class Alert extends Component {
     isLoading: boolean,
     systemStates?: Array<Object>
   };
+  unregisterFunction: () => void;
 
   constructor() {
     super();
@@ -42,10 +45,20 @@ class Alert extends Component {
     };
     (this:any).handleNextPage = this.handleNextPage.bind(this);
     (this:any).loadNext = this.loadNext.bind(this);
+    (this:any).reloadData = this.reloadData.bind(this);
   }
 
   componentDidMount() {
+    if (shouldRegisterForUpdates()) {
+      this.unregisterFunction = registerForUpdates(this.reloadData);
+    }
     this.loadNext();
+  }
+
+  componentWillUnmount() {
+    if (this.unregisterFunction) {
+      this.unregisterFunction();
+    }
   }
 
   handleNextPage() {
@@ -64,6 +77,17 @@ class Alert extends Component {
         })
       })
   }
+
+  reloadData() {
+    this.setState(( prevState ) => {
+      return {
+        isLoading: true,
+        systemStates: [],
+        nextSkip: 0
+      }
+    }, () => this.loadNext())
+  }
+
   render() {
     return (
       <div>

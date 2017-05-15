@@ -16,6 +16,8 @@ import {getElementsStats} from '../api/elements';
 import {getSystemStats} from '../api/states';
 import moment from 'moment';
 import PieChart from '../Components/Charts/PieChart';
+import {registerForUpdates, shouldRegisterForUpdates} from '../api/realtime';
+
 
 const SimpleBarChart = ({data}) => {
   return (
@@ -62,6 +64,8 @@ class Stats extends Component {
     stateClassStats: Array<{value: number, name: string}>,
     elementsStats: Array<{count: number, name: string, _id: string}>
   };
+  unregisterFunction: () => void;
+  
   constructor() {
     super();
     this.state = {
@@ -70,8 +74,23 @@ class Stats extends Component {
       stateClassStats: [],
       elementsStats: []
     };
+
+    (this:any).reloadData = this.reloadData.bind(this);
   }
   componentDidMount() {
+    if (shouldRegisterForUpdates()) {
+      this.unregisterFunction = registerForUpdates(this.reloadData);
+    }
+    this.reloadData();
+  }
+
+  componentWillUnmount() {
+    if (this.unregisterFunction) {
+      this.unregisterFunction();
+    }
+  }
+
+  reloadData() {
     const systemStatsPrmise = getSystemStats()
       .then(({timeSeriesGraph, stateClassStats}: {timeSeriesGraph: Array<Object>, stateClassStats: any}) => {
         timeSeriesGraph = timeSeriesGraph.map((data) => {

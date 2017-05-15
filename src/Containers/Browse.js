@@ -2,13 +2,16 @@
 import React from 'react';
 import {withRouter} from 'react-router';
 import TableView from '../Components/TableView';
-import { getData } from '../api/data';
+import {getData} from '../api/data';
 import type {Data, Element} from '../Types/data';
+import {registerForUpdates, shouldRegisterForUpdates} from '../api/realtime';
 
 function serializeFilterConfig(filterConfig: Object) {
   const serializedConfig = {};
   if (filterConfig.elements) {
-    serializedConfig.elements = filterConfig.elements.map((element: Element) => element._id);
+    serializedConfig.elements = filterConfig.elements.map(
+      (element: Element) => element._id
+    );
   }
 
   if (filterConfig.state) {
@@ -23,16 +26,17 @@ function serializeFilterConfig(filterConfig: Object) {
 }
 
 type State = {
-    isLoading: boolean,
-    top: number,
-    skip: number,
-    filterConfig: Object,
-    dataSet?: Array<Data>
-  };
+  isLoading: boolean,
+  top: number,
+  skip: number,
+  filterConfig: Object,
+  dataSet?: Array<Data>
+};
 
 class Browse extends React.Component {
   state: State;
   initialFilterConfigElementId: string;
+  unregisterFunction: () => void;
 
   constructor(props: Object) {
     super(props);
@@ -47,17 +51,27 @@ class Browse extends React.Component {
     if (props.router) {
       const {element: elementId} = props.router.getCurrentLocation().query;
       if (elementId) {
-          this.initialFilterConfigElementId = elementId;
-          this.state.filterConfig = {elements: [elementId]};
+        this.initialFilterConfigElementId = elementId;
+        this.state.filterConfig = {elements: [elementId]};
       }
     }
 
-    (this:any).showMore = this.showMore.bind(this);
-    (this:any).onFilterChange = this.onFilterChange.bind(this);
+    (this: any).showMore = this.showMore.bind(this);
+    (this: any).onFilterChange = this.onFilterChange.bind(this);
+    (this: any).reloadData = this.reloadData.bind(this);
   }
 
   componentDidMount() {
+    if (shouldRegisterForUpdates()) {
+      this.unregisterFunction = registerForUpdates(this.reloadData);
+    }
     this.loadNext();
+  }
+
+  componentWillUnmount() {
+    if (this.unregisterFunction) {
+      this.unregisterFunction();
+    }
   }
 
   showMore() {
@@ -65,28 +79,51 @@ class Browse extends React.Component {
   }
 
   loadNext() {
-    return getData(this.state.top, this.state.skip, this.state.filterConfig)
-      .then((dataSet: Array<Data>) => {
-        this.setState((prevState: State)=> {
-          return {
-            isLoading: false,
-            dataSet: prevState.dataSet ? prevState.dataSet.concat(dataSet) : dataSet,
-            skip: prevState.skip + 50
-          }
-        })
-      })
+    return getData(
+      this.state.top,
+      this.state.skip,
+      this.state.filterConfig
+    ).then((dataSet: Array<Data>) => {
+      this.setState((prevState: State) => {
+        return {
+          isLoading: false,
+          dataSet: prevState.dataSet
+            ? prevState.dataSet.concat(dataSet)
+            : dataSet,
+          skip: prevState.skip + 50
+        };
+      });
+    });
   }
 
   onFilterChange(filterConfig: Object) {
     console.log(filterConfig);
-    this.setState({
-      dataSet: [],
-      filterConfig: serializeFilterConfig(filterConfig),
-      top: 50,
-      skip: 0
-    }, () => {
-      this.loadNext();
-    });
+    this.setState(
+      {
+        dataSet: [],
+        filterConfig: serializeFilterConfig(filterConfig),
+        top: 50,
+        skip: 0
+      },
+      () => {
+        this.loadNext();
+      }
+    );
+  }
+
+  reloadData() {
+    this.setState(
+      () => {
+        return {
+          isLoading: true,
+          dataSet: [],
+          skip: 0
+        };
+      },
+      () => {
+        this.loadNext();
+      }
+    );
   }
 
   render() {
@@ -95,17 +132,20 @@ class Browse extends React.Component {
         <div>
           Загрузка ...
         </div>
-      )
+      );
     } else {
-
     }
     return (
       <div>
-        <TableView dataSet={this.state.dataSet} onFilterChange={this.onFilterChange} initialFilterConfigElementId={this.initialFilterConfigElementId}/>
+        <TableView
+          dataSet={this.state.dataSet}
+          onFilterChange={this.onFilterChange}
+          initialFilterConfigElementId={this.initialFilterConfigElementId}
+        />
         <div>
-            <button className="btn center-block" onClick={this.showMore}>
-              Загрузить ещё
-            </button>
+          <button className="btn center-block" onClick={this.showMore}>
+            Загрузить ещё
+          </button>
         </div>
       </div>
     );

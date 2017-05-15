@@ -7,6 +7,8 @@ import moment from 'moment';
 import {TableListBody} from '../Components/TableView/TableList';
 import {BigCard, SmallCard} from '../Components/Cards';
 import StateBlocks from '../Components/StateBlocks';
+import {registerForUpdates, shouldRegisterForUpdates} from '../api/realtime';
+
 
 const formatDate = ({from, to}) => {
   return `${moment(from).format('L : LTS')} - ${moment(to).format('L : LTS')}`;
@@ -30,6 +32,7 @@ type State = {
 
 class Page extends Component {
   state: State;
+  unregisterFunction: () => void;
 
   constructor() {
     super();
@@ -41,10 +44,20 @@ class Page extends Component {
     };
 
     (this: any).handleNextPage = this.handleNextPage.bind(this);
+    (this: any).reloadData = this.reloadData.bind(this);
   }
 
   componentDidMount() {
+    if (shouldRegisterForUpdates()) {
+      this.unregisterFunction = registerForUpdates(this.reloadData);
+    }
     this.loadNext();
+  }
+
+  componentWillUnmount() {
+    if (this.unregisterFunction) {
+      this.unregisterFunction();
+    }
   }
 
   handleNextPage() {
@@ -63,6 +76,21 @@ class Page extends Component {
         };
       });
     });
+  }
+
+  reloadData() {
+    this.setState(
+      () => {
+        return {
+          isLoading: true,
+          systemStates: [],
+          skip: 0
+        };
+      },
+      () => {
+        this.loadNext();
+      }
+    );
   }
 
   render() {
@@ -115,7 +143,7 @@ class Page extends Component {
                   Состояние трубопровода: {currentState.stateClass.name}
                 </h4>
                 <h5 style={{margin: 0}}>
-                  {currentState.stateClass.action.message}
+                  {currentState.stateClass.action && currentState.stateClass.action.message}
                 </h5>
                 <h6 style={{margin: 0}}>
                   {currentState.criticalData.shortMessage}

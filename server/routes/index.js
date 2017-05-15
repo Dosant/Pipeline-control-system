@@ -6,7 +6,7 @@ function createRouter(wss) {
   router.use('/states', require('./states'));
 
   router.use('/services', require('./services'));
-  router.use('/realtime', require('./realtime')(wss));
+  router.use('/realtime', require('./realtime').createRouter(wss));
 
   return router;
 }

@@ -19,6 +19,7 @@ router.get('/total', (req, res, next) => {
   });
 });
 
+const { notifyAboutNewData } = require('./realtime');
 router.post('/', (req, res, next) => {
   let dataSet = req.body;
   dataSet = mapStateToDataSet(dataSet);
@@ -30,6 +31,7 @@ router.post('/', (req, res, next) => {
       return countData();
     })
     .then(total => {
+      notifyAboutNewData();
       res.send(200, total);
     });
 });

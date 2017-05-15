@@ -32,19 +32,38 @@ const Shell = ({children}) => {
   );
 };
 
+
+function setModeGlobally(state) {
+  if (state && state.isDynamic) {
+    window.isDynamic = true;
+  }  
+}
+
 class App extends Component {
+  constructor() {
+    super();
+    this.onEnterResultsState = this.onEnterResultsState.bind(this);
+    this.authRequiredHook = this.authRequiredHook.bind(this);
+  }
+  onEnterResultsState(nextState, replace) {
+    this.authRequiredHook(nextState, replace);
+    setModeGlobally(nextState.location.state)
+  }
   authRequiredHook(nextState, replace) {
+    if(this.user) {
+      return ;
+    }
     if (nextState.location.state && nextState.location.state.user === 'test') {
+      this.user = nextState.location.state.user;
       return;
     } else {
-      return;
       replace('/login');
     }
   }
   render() {
     return (
       <Router history={browserHistory}>
-        <Route path="/" component={Shell} onEnter={this.authRequiredHook}>
+        <Route path="/" component={Shell} onEnter={this.onEnterResultsState}>
           <IndexRoute component={Page} />
           <Router path="browse" component={Browse} />
           <Router path="map" component={Map} />
