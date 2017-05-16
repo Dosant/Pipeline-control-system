@@ -27,8 +27,8 @@ class Login extends Component {
               <h4>Система управления трубопроводом</h4>
               <br />
               <form onSubmit={this.onLogin}>
-                <input type="text" name="user" placeholder="Username" />
-                <input type="password" name="pass" placeholder="Password" />
+                <input type="text" name="user" placeholder="Логин" />
+                <input type="password" name="pass" placeholder="Пароль" />
                 <input type="submit" name="login" className="login loginmodal-submit" value="Войти" />
                 {this.state.error && <p className="error-message">Неверный логин или пароль. <br/> Не расстраивайтесь, вы можете зайти как <Link to={{pathname: '/menu', state: { user: 'test' }}}>тестовый пользователь</Link></p>}
               </form>

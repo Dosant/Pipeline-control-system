@@ -52,4 +52,4 @@ process.on('SIGINT', function() {
 app.use('/api', require('./server/routes')(wss));
 app.use('/data', express.static('data/'));
 app.use('/', express.static('build/'));
-// app.use('/*', express.static('build/index.html'));
+app.use('/*', express.static('build/index.html'));
