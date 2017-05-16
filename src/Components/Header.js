@@ -20,11 +20,11 @@ const StatusIcon = ({isConnected}) => {
 
 const RenderStatus = () => {
   if (window.isDynamic) {
-    return <span>Онлайн <StatusIcon isConnected /></span>
+    return <span>Онлайн <StatusIcon isConnected /></span>;
   } else {
-    return <span>Оффлайн <StatusIcon isConnected={false} /></span>
+    return <span>Оффлайн <StatusIcon isConnected={false} /></span>;
   }
-}
+};
 
 const Header = ({router}) => {
   return (
