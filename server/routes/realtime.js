@@ -41,6 +41,14 @@ function createRouter(wss) {
         break;
       case `/api/${CLIENT_PATH}`:
         console.log('Client connected');
+        
+        let pingPong = setInterval(() => {
+          ws.ping();
+        }, 5000);
+        ws.on('close', () => {
+          clearInterval(pingPong);
+        });
+
         break;
       default:
         console.log('Unknown path', location.path);
